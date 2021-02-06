@@ -2,8 +2,11 @@ package main
 
 import (
 	"fmt"
+	"html/template"
 	"net/http"
 )
+
+var homeTemplate *template.Template
 
 // w -> writer -> miejsce do którego wypiszemy wynik naszej funkcji
 // wynikiem może być teskt, html, lub inny fomrat danych
@@ -11,23 +14,27 @@ import (
 
 func home(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
-	fmt.Fprintf(w, "Welcome to my home page") // Fprintf wypisuje podany tekst na podane wyjscie
+	homeTemplate.Execute(w, nil)
 }
 
 func user(w http.ResponseWriter, req *http.Request) {
-	
+
 	fmt.Fprintf(w, "<h1>Hello, my user </h1>")
 }
 
 func main() {
+
+	//Pasrowanie szablonów(templaty) html
+	homeTemplate = template.Must(template.ParseFiles("./view/home.html"))
+
 	// mux => HTTP request multiplexer => program który obsługuje  requesty od klientów
 	// dopasowuje url do opowiedniej funkcji
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", home)
-	mux.HandleFunc("/user/", user)
+	mux.HandleFunc("/contact/", user)
 
-	http.ListenAndServe("localhost:3000", mux)
 	fmt.Println("Server start with a bump")
 
+	http.ListenAndServe("localhost:3000", mux)
 }
