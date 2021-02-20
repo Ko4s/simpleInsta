@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"simpleinsta/views"
 )
 
 var homeTemplate *template.Template
@@ -16,14 +17,11 @@ var faqTemplate *template.Template
 
 func home(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
+	err := homeTemplate.ExecuteTemplate(w, "bootstrap", nil)
 
-	dumbUser := User{
-		Name:  "Piotrek",
-		Color: "Red",
-		Age:   253623,
+	if err != nil {
+		fmt.Println(err)
 	}
-
-	homeTemplate.ExecuteTemplate(w, "bootstrap", dumbUser)
 }
 
 func contact(w http.ResponseWriter, req *http.Request) {
@@ -45,9 +43,11 @@ type User struct {
 func main() {
 
 	//Pasrowanie szablonów(templaty) html
-	homeTemplate = template.Must(template.ParseFiles("./view/layouts/bootstrap.html", "./view/home.html"))
-	contactTemplate = template.Must(template.ParseFiles("./view/contact.html"))
-	faqTemplate = template.Must(template.ParseFiles("./view/faq.html"))
+	homeView := views.NewView("boostrap", "home")
+
+	homeTemplate = homeView.Template
+	contactTemplate = template.Must(template.ParseFiles("./views/contact.html"))
+	faqTemplate = template.Must(template.ParseFiles("./views/faq.html"))
 
 	// mux => HTTP request multiplexer => program który obsługuje  requesty od klientów
 	// dopasowuje url do opowiedniej funkcji
